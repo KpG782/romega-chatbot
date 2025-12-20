@@ -1,0 +1,26 @@
+# Google ADK
+google-adk>=0.3.0
+
+# Google Generative AI (for Gemini)
+google-generativeai>=0.4.0
+
+# RAG Pipeline Dependencies
+chromadb>=0.4.22
+sentence-transformers>=2.3.1
+
+# Explicitly use CPU-only torch (no CUDA)
+--extra-index-url https://download.pytorch.org/whl/cpu
+
+# Environment variables
+python-dotenv>=1.0.0
+
+# API and Web Framework (for production deployment)
+fastapi>=0.109.0
+uvicorn[standard]>=0.27.0
+
+# Additional utilities
+pydantic>=2.5.0
+requests>=2.31.0
+
+# Numpy (ensure CPU version)
+numpy>=1.24.0
