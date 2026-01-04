@@ -1,8 +1,8 @@
 # Google ADK
 google-adk>=0.3.0
 
-# Google Generative AI (for Gemini)
-google-generativeai>=0.4.0
+# Google Generative AI (for Gemini) - New package
+google-genai>=0.2.0
 
 # RAG Pipeline Dependencies
 chromadb>=0.4.22

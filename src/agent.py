@@ -5,8 +5,9 @@ Integrates RAG pipeline with Google ADK for intelligent responses
 
 import os
 from dotenv import load_dotenv
-from src.rag_pipeline import RomegaRAGPipeline
-import google.generativeai as genai
+from rag_pipeline import RomegaRAGPipeline
+from google import genai
+from google.genai import types
 
 class RomegaChatbotAgent:
     def __init__(self):
@@ -20,8 +21,8 @@ class RomegaChatbotAgent:
         if not self.api_key:
             raise ValueError("GOOGLE_API_KEY not found in environment variables. Please check your .env file")
         
-        # Configure Google AI
-        genai.configure(api_key=self.api_key)
+        # Configure Google AI client
+        self.client = genai.Client(api_key=self.api_key)
         
         # Initialize RAG pipeline
         print("🔧 Initializing RAG pipeline...")
@@ -50,11 +51,8 @@ When you don't know something specific, be honest and encourage users to schedul
 Always base your answers on the provided context from the knowledge base.
 """
         
-        # Create the Gemini model
-        self.model = genai.GenerativeModel(
-            model_name='gemini-2.0-flash-exp',
-            system_instruction=self.system_instruction
-        )
+        # Configure the model
+        self.model_name = 'gemini-2.0-flash-exp'
         
         print("✅ Romega Chatbot Agent ready!")
     
@@ -89,7 +87,15 @@ Please answer the user's question using the provided context. If the context doe
         print("🤖 Agent: Generating response...")
         
         try:
-            response = self.model.generate_content(enhanced_prompt)
+            # Combine system instruction with enhanced prompt
+            full_prompt = f"""{self.system_instruction}
+
+{enhanced_prompt}"""
+            
+            response = self.client.models.generate_content(
+                model=self.model_name,
+                contents=full_prompt
+            )
             return response.text
         except Exception as e:
             return f"Error generating response: {str(e)}"
