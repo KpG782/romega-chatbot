@@ -174,7 +174,7 @@ async def health_check():
 
 @app.post("/chat", response_model=ChatResponse)
 @limiter.limit("20/minute")  # Rate limit: 20 requests per minute per IP
-async def chat(request: ChatRequest, req: Request):
+async def chat(chat_request: ChatRequest, request: Request):
     """
     Main chat endpoint with rate limiting and caching
     
@@ -190,7 +190,7 @@ async def chat(request: ChatRequest, req: Request):
             detail="Chatbot not initialized. Please try again later."
         )
     
-    if not request.message or not request.message.strip():
+    if not chat_request.message or not chat_request.message.strip():
         raise HTTPException(
             status_code=400,
             detail="Message cannot be empty"
@@ -199,8 +199,8 @@ async def chat(request: ChatRequest, req: Request):
     try:
         # Check cache first if enabled
         cached_response = None
-        if request.use_cache:
-            cached_response = get_cached_response(request.message)
+        if chat_request.use_cache:
+            cached_response = get_cached_response(chat_request.message)
         
         if cached_response:
             logger.info("Returning cached response")
@@ -211,12 +211,12 @@ async def chat(request: ChatRequest, req: Request):
             )
         
         # Get response from chatbot
-        logger.info(f"Processing chat request: {request.message[:50]}...")
-        response_text = chatbot.query_with_rag(request.message)
+        logger.info(f"Processing chat request: {chat_request.message[:50]}...")
+        response_text = chatbot.query_with_rag(chat_request.message)
         
         # Cache the response
-        if request.use_cache:
-            set_cached_response(request.message, response_text)
+        if chat_request.use_cache:
+            set_cached_response(chat_request.message, response_text)
         
         return ChatResponse(
             response=response_text,

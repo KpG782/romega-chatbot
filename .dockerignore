@@ -12,6 +12,7 @@ build/
 venv/
 env/
 ENV/
+.venv/
 
 # IDEs
 .vscode/
@@ -27,20 +28,46 @@ Thumbs.db
 # Git
 .git/
 .gitignore
+.gitattributes
 
-# Environment files
+# Environment files (NEVER include API keys in image!)
 .env
 .env.local
 .env.*.local
+.env.example
 
 # Testing
 .pytest_cache/
 .coverage
 htmlcov/
+tests/
+test_*.py
+*_test.py
 
-# Documentation
+# Documentation (no need in production image)
 README.md
 docs/
+*.md
+LICENSE
 
 # Logs
 *.log
+logs/
+
+# Docker files (no need in the image itself)
+Dockerfile*
+docker-compose*.yml
+.dockerignore
+
+# CI/CD
+.github/
+.gitlab-ci.yml
+.travis.yml
+
+# Development scripts
+Makefile
+test_api.sh
+
+# Jupyter notebooks (if any)
+*.ipynb
+.ipynb_checkpoints/

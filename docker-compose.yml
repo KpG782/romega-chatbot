@@ -13,6 +13,11 @@ services:
       - PORT=8000
     env_file:
       - .env
+    volumes:
+      # Persistent storage for ChromaDB vectors (survives container restarts)
+      - chroma_data:/app/chroma_db
+      # Optional: Persistent logs
+      - ./logs:/app/logs
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
@@ -20,3 +25,8 @@ services:
       timeout: 10s
       retries: 3
       start_period: 40s
+
+# Named volumes for data persistence
+volumes:
+  chroma_data:
+    driver: local

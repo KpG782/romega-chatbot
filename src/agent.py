@@ -8,7 +8,7 @@ import logging
 import time
 from typing import Optional
 from dotenv import load_dotenv
-from rag_pipeline import RomegaRAGPipeline
+from src.rag_pipeline import RomegaRAGPipeline
 from google import genai
 from google.genai import types
 
