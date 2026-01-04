@@ -4,17 +4,23 @@ Handles: Extract -> Chunk -> Embed -> Vectorize -> Retrieve
 """
 
 import json
+import logging
+import os
 from typing import List, Dict, Any
 from sentence_transformers import SentenceTransformer
 import chromadb
 from chromadb.config import Settings
 
+# Configure logging
+logger = logging.getLogger(__name__)
+
 class RomegaRAGPipeline:
-    def __init__(self, kb_path: str = None):
-        """Initialize the RAG pipeline with knowledge base path"""
+    def __init__(self, kb_path: str = None, persist_directory: str = "./chroma_db"):
+        """Initialize the RAG pipeline with knowledge base path and persistence"""
+        logger.info("Initializing RAG Pipeline...")
+        
         if kb_path is None:
             # Try multiple paths to find the knowledge base
-            import os
             possible_paths = [
                 "knowledge_base/romega_kb.json",  # Docker/production
                 "../knowledge_base/romega_kb.json",  # Local development
@@ -23,35 +29,54 @@ class RomegaRAGPipeline:
             for path in possible_paths:
                 if os.path.exists(path):
                     kb_path = path
+                    logger.info("Found knowledge base at: %s", kb_path)
                     break
             if kb_path is None:
+                logger.error("Knowledge base not found in any expected location")
                 raise FileNotFoundError("Could not find romega_kb.json in any expected location")
         
         self.kb_path = kb_path
+        self.persist_directory = persist_directory
+        
+        # Create persist directory if it doesn't exist
+        os.makedirs(self.persist_directory, exist_ok=True)
+        logger.info("Using persistent storage at: %s", self.persist_directory)
+        
+        # Initialize embedding model
+        logger.info("Loading embedding model: all-MiniLM-L6-v2")
         self.embedding_model = SentenceTransformer('all-MiniLM-L6-v2')
         
-        # Initialize ChromaDB (vector database)
-        self.chroma_client = chromadb.Client(Settings(
-            anonymized_telemetry=False,
-            allow_reset=True
-        ))
+        # Initialize ChromaDB with persistence
+        self.chroma_client = chromadb.PersistentClient(
+            path=self.persist_directory,
+            settings=Settings(
+                anonymized_telemetry=False,
+                allow_reset=True
+            )
+        )
+        logger.info("ChromaDB initialized with persistence")
         
         # Create or get collection
         self.collection = self.chroma_client.get_or_create_collection(
             name="romega_knowledge_base",
             metadata={"description": "Romega Solutions company knowledge"}
         )
+        logger.info("Collection loaded: %d existing vectors", self.collection.count())
         
         self.knowledge_base = None
         self.chunks = []
     
     def load_knowledge_base(self) -> Dict[str, Any]:
         """Step 1: EXTRACT - Load the JSON knowledge base"""
-        print("📥 Loading knowledge base...")
-        with open(self.kb_path, 'r', encoding='utf-8') as f:
-            self.knowledge_base = json.load(f)
-        print(f"✅ Loaded {len(self.knowledge_base)} main sections")
-        return self.knowledge_base
+        logger.info("📥 Loading knowledge base...")
+        try:
+            with open(self.kb_path, 'r', encoding='utf-8') as f:
+                self.knowledge_base = json.load(f)
+            logger.info(f"✅ Loaded {len(self.knowledge_base)} main sections")
+            return self.knowledge_base
+        except Exception as e:
+            logger.error(f"Failed to load knowledge base: {e}", exc_info=True)
+            raise
     
     def chunk_data(self) -> List[Dict[str, Any]]:
         """
@@ -145,77 +170,115 @@ class RomegaRAGPipeline:
         print(f"✅ Created {len(chunks)} chunks")
         return chunks
     
-    def embed_and_vectorize(self):
+    def embed_and_vectorize(self, force_rebuild: bool = False):
         """
         Step 3 & 4: EMBED and VECTORIZE
         Convert chunks to embeddings and store in vector database
         """
-        print("🧠 Embedding and vectorizing chunks...")
+        # Check if collection already has vectors (from persistence)
+        existing_count = self.collection.count()
+        if existing_count > 0 and not force_rebuild:
+            logger.info(f"📦 Using {existing_count} existing vectors from persistent storage")
+            return
+        
+        logger.info("🧠 Embedding and vectorizing chunks...")
         
         if not self.chunks:
+            logger.error("No chunks found to embed")
             raise ValueError("No chunks found. Run chunk_data() first.")
         
-        # Extract content for embedding
-        texts = [chunk['content'] for chunk in self.chunks]
-        
-        # Generate embeddings
-        embeddings = self.embedding_model.encode(texts, show_progress_bar=True)
-        
-        # Prepare data for ChromaDB
-        ids = [chunk['id'] for chunk in self.chunks]
-        metadatas = [chunk['metadata'] for chunk in self.chunks]
-        
-        # Store in vector database
-        self.collection.add(
-            embeddings=embeddings.tolist(),
-            documents=texts,
-            metadatas=metadatas,
-            ids=ids
-        )
-        
-        print(f"✅ Stored {len(self.chunks)} embeddings in vector database")
+        try:
+            # Extract content for embedding
+            texts = [chunk['content'] for chunk in self.chunks]
+            
+            # Generate embeddings
+            logger.info(f"Generating embeddings for {len(texts)} chunks...")
+            embeddings = self.embedding_model.encode(texts, show_progress_bar=True)
+            
+            # Prepare data for ChromaDB
+            ids = [chunk['id'] for chunk in self.chunks]
+            metadatas = [chunk['metadata'] for chunk in self.chunks]
+            
+            # Clear existing if force rebuild
+            if force_rebuild and existing_count > 0:
+                logger.warning(f"Force rebuild: Clearing {existing_count} existing vectors")
+                # Delete collection and recreate
+                self.chroma_client.delete_collection(name="romega_knowledge_base")
+                self.collection = self.chroma_client.create_collection(
+                    name="romega_knowledge_base",
+                    metadata={"description": "Romega Solutions company knowledge"}
+                )
+            
+            # Store in vector database
+            self.collection.add(
+                embeddings=embeddings.tolist(),
+                documents=texts,
+                metadatas=metadatas,
+                ids=ids
+            )
+            
+            logger.info(f"✅ Stored {len(self.chunks)} embeddings in vector database")
+        except Exception as e:
+            logger.error(f"Failed to embed and vectorize: {e}", exc_info=True)
+            raise
     
     def retrieve(self, query: str, top_k: int = 3) -> List[Dict[str, Any]]:
         """
         Step 5: RETRIEVE - Find most relevant chunks for a query
         """
-        print(f"🔍 Retrieving top {top_k} results for: '{query}'")
+        logger.debug(f"🔍 Retrieving top {top_k} results for: '{query}'")
         
-        # Embed the query
-        query_embedding = self.embedding_model.encode([query])[0]
-        
-        # Search vector database
-        results = self.collection.query(
-            query_embeddings=[query_embedding.tolist()],
-            n_results=top_k
-        )
-        
-        # Format results
-        retrieved_chunks = []
-        for i in range(len(results['ids'][0])):
-            retrieved_chunks.append({
-                'id': results['ids'][0][i],
-                'content': results['documents'][0][i],
-                'metadata': results['metadatas'][0][i],
-                'distance': results['distances'][0][i] if 'distances' in results else None
-            })
-        
-        return retrieved_chunks
+        try:
+            # Embed the query
+            query_embedding = self.embedding_model.encode([query])[0]
+            
+            # Search vector database
+            results = self.collection.query(
+                query_embeddings=[query_embedding.tolist()],
+                n_results=top_k
+            )
+            
+            # Format results
+            retrieved_chunks = []
+            for i in range(len(results['ids'][0])):
+                retrieved_chunks.append({
+                    'id': results['ids'][0][i],
+                    'content': results['documents'][0][i],
+                    'metadata': results['metadatas'][0][i],
+                    'distance': results['distances'][0][i] if 'distances' in results else None
+                })
+            
+            logger.debug(f"Retrieved {len(retrieved_chunks)} relevant chunks")
+            return retrieved_chunks
+        except Exception as e:
+            logger.error(f"Failed to retrieve results for query '{query}': {e}", exc_info=True)
+            raise
     
-    def setup_pipeline(self):
+    def setup_pipeline(self, force_rebuild: bool = False):
         """Run the complete pipeline: Extract -> Chunk -> Embed -> Vectorize"""
-        print("\n🚀 Starting RAG Pipeline Setup...\n")
+        logger.info("\n🚀 Starting RAG Pipeline Setup...\n")
         
-        # Extract
-        self.load_knowledge_base()
+        # Check if we already have vectors from persistence
+        existing_count = self.collection.count()
+        if existing_count > 0 and not force_rebuild:
+            logger.info(f"✅ Using {existing_count} existing vectors from persistent storage")
+            logger.info("\n✅ RAG Pipeline ready!\n")
+            return
         
-        # Chunk
-        self.chunk_data()
-        
-        # Embed & Vectorize
-        self.embed_and_vectorize()
-        
-        print("\n✅ RAG Pipeline setup complete!\n")
+        try:
+            # Extract
+            self.load_knowledge_base()
+            
+            # Chunk
+            self.chunk_data()
+            
+            # Embed & Vectorize
+            self.embed_and_vectorize(force_rebuild=force_rebuild)
+            
+            logger.info("\n✅ RAG Pipeline setup complete!\n")
+        except Exception as e:
+            logger.error(f"Pipeline setup failed: {e}", exc_info=True)
+            raise
     
     def test_retrieval(self):
         """Test the retrieval with sample queries"""
