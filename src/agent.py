@@ -55,26 +55,53 @@ class RomegaChatbotAgent:
             logger.error(f"Failed to initialize RAG pipeline: {e}", exc_info=True)
             raise
         
-        # System instruction for the agent
+        # ✨ IMPROVEMENT #2: Enhanced System Instruction with Brand Personality
         self.system_instruction = """
-You are a helpful AI assistant for Romega Solutions, a US-based holding company specializing in recruitment and business support services.
+You are the friendly and knowledgeable AI assistant for Romega Solutions - a US-based holding company that's revolutionizing recruitment and business support services.
 
-Your role is to:
-1. Answer questions about Romega Solutions' services (RPO, BPO, Strategic HR, Quality Hire, etc.)
-2. Provide information about pricing, timelines, and processes
-3. Help schedule consultations and provide contact information
-4. Maintain a professional, friendly, and helpful tone
+🎯 YOUR PERSONALITY:
+- Professional yet warm and approachable
+- Enthusiastic about helping companies find amazing talent
+- Confident but never pushy
+- Clear communicator who avoids jargon
+- Genuinely helpful and solutions-oriented
 
-Key facts to remember:
-- Romega is founded by Robbie Galoso
-- We're 60-70% faster than traditional recruitment methods
-- We have 95%+ retention rates
-- Our fees are 15% lower than competitors
-- We specialize in Philippine-based talent leading global innovation
+💼 YOUR ROLE:
+1. Answer questions about Romega Solutions' services with enthusiasm
+2. Highlight our unique value propositions (speed, retention, cost savings)
+3. Guide prospects toward scheduling consultations
+4. Provide accurate, context-based information
+5. Build trust through transparency
 
-When you don't know something specific, be honest and encourage users to schedule a consultation or contact us directly at info@romega-solutions.com or through our website www.romega-solutions.com.
+🌟 KEY FACTS TO EMPHASIZE:
+- Founded by Robbie Galoso - visionary in recruitment innovation
+- 60-70% FASTER than traditional recruitment methods
+- 95%+ retention rates (industry-leading!)
+- 15% LOWER fees than competitors
+- Specializing in Philippine-based talent leading global innovation
+- Services: RPO, BPO, Strategic HR, Quality Hire (Executive Search), Mentoring, Training
 
-Always base your answers on the provided context from the knowledge base.
+✅ RESPONSE GUIDELINES:
+- Start responses positively and engagingly
+- Use specific numbers and facts when available
+- Include clear call-to-actions (schedule consultation, contact us)
+- If you don't have specific information, be honest and redirect helpfully
+- Keep responses conversational but professional
+- Use emojis sparingly for emphasis (1-2 per response max)
+
+❌ AVOID:
+- Making up information not in the context
+- Overpromising or using aggressive sales language
+- Being too formal or robotic
+- Technical jargon without explanation
+- Negative language about competitors
+
+📧 CONTACT OPTIONS TO OFFER:
+- Email: info@romega-solutions.com
+- Website: www.romega-solutions.com
+- Encourage scheduling free consultations
+
+Remember: You represent Romega Solutions 24/7. Every interaction is a chance to make a great first impression!
 """
         
         # Configure the model
@@ -161,6 +188,57 @@ Please answer the user's question using the provided context. If the context doe
         except Exception as e:
             logger.error(f"Error in query_with_rag: {e}", exc_info=True)
             return "I apologize, but an error occurred while processing your question. Please contact us at info@romega-solutions.com for assistance."
+    
+    def query_with_rag_and_metadata(self, user_message: str) -> tuple[str, list]:
+        """
+        Process a user query using RAG pipeline and return metadata
+        Returns: (response_text, retrieved_chunks)
+        """
+        logger.info(f"Processing query with metadata: {user_message[:50]}...")
+        
+        try:
+            # Step 1: Retrieve relevant context
+            logger.debug("Retrieving relevant context from knowledge base")
+            relevant_chunks = self.rag.retrieve(user_message, top_k=3)
+            
+            if not relevant_chunks:
+                logger.warning("No relevant context found")
+                fallback_msg = "I apologize, but I couldn't find relevant information to answer your question. Please contact us at info@romega-solutions.com for assistance."
+                return fallback_msg, []
+            
+            # Step 2: Prepare context for the agent
+            context = "\n\n".join([
+                f"[Context {i+1}]: {chunk['content']}" 
+                for i, chunk in enumerate(relevant_chunks)
+            ])
+            
+            # Step 3: Create enhanced prompt with context
+            enhanced_prompt = f"""{self.system_instruction}
+
+Context from Romega Solutions knowledge base:
+{context}
+
+User question: {user_message}
+
+Please answer the user's question using the provided context. If the context doesn't contain enough information, acknowledge this and suggest contacting Romega Solutions directly.
+"""
+            
+            # Step 4: Get response from Gemini with retry logic
+            logger.debug("Generating response with Gemini")
+            response_text = self._generate_with_retry(enhanced_prompt)
+            
+            if response_text:
+                logger.info("Successfully generated response")
+                return response_text, relevant_chunks
+            else:
+                logger.error("Failed to generate response after all retries")
+                error_msg = "I apologize, but I'm having trouble generating a response right now. Please try again in a moment or contact us at info@romega-solutions.com."
+                return error_msg, relevant_chunks
+                
+        except Exception as e:
+            logger.error(f"Error in query_with_rag_and_metadata: {e}", exc_info=True)
+            error_msg = "I apologize, but an error occurred while processing your question. Please contact us at info@romega-solutions.com for assistance."
+            return error_msg, []
     
     def run_interactive(self):
         """Run the chatbot in interactive mode"""
