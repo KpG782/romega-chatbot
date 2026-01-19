@@ -22,7 +22,12 @@
       "talent acquisition",
       "Philippine talent",
       "remote work",
-      "global innovation"
+      "global innovation",
+      "digital marketing",
+      "ROMEGA Digital",
+      "social media marketing",
+      "advertising",
+      "content creation"
     ]
   },
   "services": {
@@ -182,6 +187,248 @@
         "workshops",
         "skills development"
       ]
+    },
+    "digital_marketing": {
+      "name": "ROMEGA Digital",
+      "description": "An extension of Romega's trusted business support services, designed to help startups, BPOs and growing businesses build strong online visibility, attract the right customers and convert leads into long-term value.",
+      "tagline": "We combine Strategy, Creativity & Data-Driven Execution to deliver measurable digital growth.",
+      "core_capabilities": {
+        "content_production": {
+          "name": "Content Production",
+          "services": ["Video production", "Graphics design", "Captions", "Short-form content (Reels, TikToks)"]
+        },
+        "campaign_execution": {
+          "name": "Campaign Execution",
+          "services": ["Running Ads", "Building Funnels", "Optimizing Results"]
+        },
+        "digital_strategy": {
+          "name": "Digital Strategy",
+          "services": ["Client Onboarding", "Brand Strategy", "Marketing Planning"]
+        },
+        "data_reporting": {
+          "name": "Data & Reporting",
+          "services": ["Analytics", "Performance Dashboards", "ROI Measurement"]
+        },
+        "client_management": {
+          "name": "Client Management",
+          "services": ["Smooth Communication", "Transparency", "Proof of Performance"]
+        },
+        "creative_direction": {
+          "name": "Creative Direction",
+          "services": ["Consistent branding", "Storytelling", "Design voice"]
+        }
+      },
+      "service_categories": {
+        "social_media_management": {
+          "name": "Social Media Management",
+          "services": [
+            "Content Strategy & Planning",
+            "Content Creation (Graphics, Captions)",
+            "Posting & Community Management",
+            "Monthly Performance Reports"
+          ]
+        },
+        "social_media_advertising": {
+          "name": "Social Media Advertising",
+          "services": [
+            "Facebook & Instagram Ads",
+            "LinkedIn Ads",
+            "Campaign Setup & Optimization",
+            "Audience Targeting",
+            "Performance Monitoring"
+          ]
+        },
+        "branding_creative": {
+          "name": "Branding & Creative Services",
+          "services": [
+            "Brand Identity & Visual Direction",
+            "Marketing Collaterals",
+            "Employer Branding Creatives"
+          ]
+        },
+        "email_marketing": {
+          "name": "Email Marketing",
+          "services": [
+            "Campaign Creation & Automation",
+            "Email Templates",
+            "Basic Automation"
+          ]
+        },
+        "website_landing_pages": {
+          "name": "Website Creation/Landing Pages",
+          "services": [
+            "Basic Website Setup",
+            "Landing Pages for Campaigns",
+            "Conversion-focused Design",
+            "Website Maintenance (contract dependent)"
+          ]
+        },
+        "branding_packages": {
+          "name": "Branding Packages",
+          "services": [
+            "Logo Design",
+            "Social Media Templates",
+            "Brand Kits",
+            "Templates"
+          ],
+          "starting_price": "$600"
+        }
+      },
+      "pricing_packages": {
+        "starter_pack": {
+          "name": "Starter Pack",
+          "target": "Best for startups",
+          "price_range": "$3,500-$5,000/month",
+          "includes": [
+            "Campaign Strategy",
+            "8 Social Creatives",
+            "Ads Setup & Management",
+            "2 Short-form Videos",
+            "Ads Management",
+            "Monthly Performance Reports"
+          ]
+        },
+        "growth_launch": {
+          "name": "Growth Launch (Standard)",
+          "price_range": "$8,000-$10,000/month",
+          "includes": [
+            "Full Campaign Strategy",
+            "12-16 Social Creatives",
+            "Paid Ads Management (Meta + Google)",
+            "A/B Testing & Optimization",
+            "Monthly Analytics & Insights Report",
+            "4 Short-form Videos"
+          ]
+        },
+        "performance_scale": {
+          "name": "Performance Scale (Advanced)",
+          "price_range": "$12,000-$25,000/month",
+          "includes": [
+            "End-to-End Campaign Ownership",
+            "Multi-platform Ads (Meta, Google, TikTok, etc.)",
+            "20+ Creatives/month",
+            "6-8 Short-form Videos",
+            "Dedicated Account Manager",
+            "Conversion-focused Landing Page Support"
+          ]
+        }
+      },
+      "add_on_services": {
+        "extra_short_form_video": {
+          "name": "Extra Short Form Video",
+          "price_range": "$500-$800"
+        },
+        "influencer_coordination": {
+          "name": "Influencer Coordination",
+          "price_range": "$800-$5,000"
+        },
+        "landing_page_copy_design": {
+          "name": "Landing Page Copy and Design",
+          "price_range": "$3,000-$7,000"
+        },
+        "email_funnel_setup": {
+          "name": "Email Funnel Setup",
+          "price_range": "$2,500-$6,000"
+        },
+        "branding_package": {
+          "name": "Branding Package",
+          "price": "$1,800"
+        },
+        "logo_design": {
+          "name": "Logo Design",
+          "starting_price": "$150"
+        }
+      },
+      "implementation_roadmap": {
+        "phase_1": {
+          "name": "Strategic Realignment",
+          "timeline": "Weeks 1-2",
+          "objectives": [
+            "Finalize Digital Marketing Vision & Service Offerings",
+            "Update Internal Org Structure",
+            "Realign Roles & Responsibilities",
+            "Set New KPIs and Metrics (campaign performance, engagement, lead gen)"
+          ],
+          "deliverables": [
+            "Updated Org Chart",
+            "List of Digital Services",
+            "Internal Communication to the Team"
+          ]
+        },
+        "phase_2": {
+          "name": "Build Capabilities",
+          "timeline": "Weeks 3-4",
+          "objectives": [
+            "Conduct Skills Gap Assessment",
+            "Begin Team Training (Social Media, Ads, Analytics, Content)",
+            "Select Tools & Platforms (Canva, Meta Suite, Trello/Asana)",
+            "Hire Missing Roles (Paid Ads/SEO Specialist)"
+          ],
+          "deliverables": [
+            "Training Plan",
+            "Tools/Tech Stack List",
+            "Recruitment for Key Roles"
+          ]
+        },
+        "phase_3": {
+          "name": "Pilot & Test",
+          "timeline": "Weeks 5-8",
+          "objectives": [
+            "Select 1-2 Clients for Pilot Campaigns",
+            "Produce Sample Content Calendar",
+            "Run Small-scale Paid Campaigns",
+            "Test Reporting Templates and Dashboard"
+          ],
+          "deliverables": [
+            "Client-Ready Campaigns",
+            "Content Production Workflow",
+            "Performance Reporting Template"
+          ]
+        },
+        "phase_4": {
+          "name": "Scale & Optimize",
+          "timeline": "Weeks 9-12",
+          "objectives": [
+            "Offer Full Services to Clients",
+            "Scale Creative Production",
+            "Launch Ads & Optimize Campaigns Weekly",
+            "Formalize Monthly Reporting",
+            "Start Building Client Testimonials"
+          ],
+          "deliverables": [
+            "Fully Functioning Digital Marketing Team",
+            "Monthly Dashboards",
+            "Client Case Studies"
+          ]
+        }
+      },
+      "keywords": [
+        "digital marketing",
+        "ROMEGA Digital",
+        "social media",
+        "advertising",
+        "ads",
+        "Facebook ads",
+        "Instagram ads",
+        "LinkedIn ads",
+        "Google ads",
+        "TikTok",
+        "content creation",
+        "video production",
+        "branding",
+        "creative services",
+        "email marketing",
+        "landing pages",
+        "website",
+        "campaign management",
+        "performance marketing",
+        "ROI",
+        "analytics",
+        "lead generation",
+        "funnels",
+        "online visibility",
+        "digital growth"
+      ]
     }
   },
   "pricing": {
@@ -324,7 +571,7 @@
     "common_questions": [
       {
         "question": "What services does Romega Solutions offer?",
-        "answer": "We provide RPO (Recruitment Process Outsourcing), BPO (Business Process Outsourcing), Strategic HR consulting, Quality Hire (Executive Search), Mentoring, and Teaching/Training services. We specialize in connecting visionary leaders with opportunities that drive growth and innovation.",
+        "answer": "We provide RPO (Recruitment Process Outsourcing), BPO (Business Process Outsourcing), Strategic HR consulting, Quality Hire (Executive Search), Mentoring, Teaching/Training, and Digital Marketing services through ROMEGA Digital. We specialize in connecting visionary leaders with opportunities that drive growth and innovation, and now help businesses build strong online visibility and convert leads into long-term value.",
         "category": "services",
         "keywords": [
           "services",
@@ -332,7 +579,37 @@
           "offerings",
           "RPO",
           "BPO",
-          "HR"
+          "HR",
+          "digital marketing",
+          "ROMEGA Digital"
+        ]
+      },
+      {
+        "question": "What is ROMEGA Digital?",
+        "answer": "ROMEGA Digital is an extension of Romega's trusted business support services, designed to help startups, BPOs and growing businesses build strong online visibility, attract the right customers and convert leads into long-term value. We combine Strategy, Creativity & Data-Driven Execution to deliver measurable digital growth. Services include Social Media Management, Social Media Advertising, Branding & Creative Services, Email Marketing, Website/Landing Pages, and comprehensive Branding Packages.",
+        "category": "digital_marketing",
+        "keywords": [
+          "ROMEGA Digital",
+          "digital marketing",
+          "social media",
+          "advertising",
+          "branding",
+          "content creation",
+          "online marketing"
+        ]
+      },
+      {
+        "question": "What are the digital marketing pricing packages?",
+        "answer": "We offer three main packages: Starter Pack ($3,500-$5,000/month) best for startups with campaign strategy, 8 social creatives, ads management, and 2 short-form videos. Growth Launch ($8,000-$10,000/month) includes full campaign strategy, 12-16 creatives, paid ads on Meta + Google, A/B testing, and 4 short-form videos. Performance Scale ($12,000-$25,000/month) provides end-to-end campaign ownership, multi-platform ads, 20+ creatives, 6-8 videos, and dedicated account manager. Add-on services are also available.",
+        "category": "digital_marketing_pricing",
+        "keywords": [
+          "digital marketing pricing",
+          "marketing packages",
+          "starter pack",
+          "growth launch",
+          "performance scale",
+          "marketing cost",
+          "advertising price"
         ]
       },
       {
@@ -406,7 +683,9 @@
     "Startups and scale-ups",
     "Remote-first organizations",
     "Global enterprises",
-    "Innovation-driven companies"
+    "Innovation-driven companies",
+    "BPOs seeking digital marketing support",
+    "Growing businesses needing online visibility"
   ],
   "success_metrics": {
     "retention_rate": "95%+",
